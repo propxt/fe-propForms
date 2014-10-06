@@ -77,7 +77,7 @@
 			
 			error: function(error) {
 
-				if(console) console.error('['+pluginName+' '+version+'] - ' + error);
+				if(console) console.warn('['+pluginName+' '+version+'] - ' + error);
 
 			},
 
@@ -858,14 +858,6 @@ $(document).ready(function() {
 
 	window.slick = new slickForms();
 
-	$('form').propForm({
-
-		wrapper : '.field-wrap',
-		tooltip : true,
-		compare : true,
-		errorClass : 'error',
-		ajax : true
-
-	});
+	$('form').propForm();
 
 });
