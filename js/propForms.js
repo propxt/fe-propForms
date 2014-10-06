@@ -59,11 +59,11 @@
 
 		instance.defaults = {
 
-			wrapper : '.form__field',
-			errorClass : 'field-error',
+			wrapper : '.field-wrap',
 			tooltip : true,
 			compare : true,
-			ajax : true,
+			errorClass : 'error',
+			ajax : true
 			pending : null,
 			success : null
 
