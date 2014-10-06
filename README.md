@@ -1,4 +1,4 @@
-fe-propForms
+propForms
 ============
 
-Propeller ajax form submission, FE validation
+Propeller ajax form submission, FE validation.

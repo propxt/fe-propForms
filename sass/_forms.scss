@@ -1,0 +1,95 @@
+.select-wrap {
+
+	position: relative;
+
+	select {
+
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		width: 100%;
+		z-index: 2;
+		opacity: 0;
+		display: block;
+		-webkit-appearance: none;
+
+	}
+
+}
+
+.checkbox-wrap {
+
+	position: relative;
+	
+	input {
+
+		opacity: 0;
+		height: 100%;
+		width: 100%;
+		position: absolute;
+		z-index: 2;
+		top: 0;
+		left: 0;
+
+	}
+
+}
+
+button {
+
+	border: 0;
+	background: none;
+
+	&:hover {
+
+		cursor: pointer;
+
+	}
+
+}
+
+.radio-wrap {
+
+	position: relative;
+
+	input {
+
+		opacity: 0;
+		height: 100%;
+		width: 100%;
+		position: absolute;
+		z-index: 2;
+		top: 0;
+		left: 0;
+
+	}
+
+}
+
+.file-wrap {
+
+	position: relative;
+	overflow: hidden;
+
+	input {
+
+		height: 100%;
+		width: 100%;
+		position: absolute;
+		z-index: 2;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		opacity: 0;
+
+		&:hover {
+
+			cursor: pointer;
+
+		}
+	}
+
+}
