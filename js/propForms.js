@@ -77,7 +77,7 @@
 			
 			error: function(error) {
 
-				console.error('['+pluginName+' '+version+'] - ' + error);
+				if(console) console.error('['+pluginName+' '+version+'] - ' + error);
 
 			},
 
