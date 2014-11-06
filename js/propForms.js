@@ -1,862 +1,896 @@
 ;(function() {
 
-	'use strict';
+    'use strict';
 
-	var version = '1.0',
-		pluginName = 'Prop Forms';
+    var version = '1.0',
+        pluginName = 'Prop Forms';
 
-	$.fn.propForm = function(options, param) {
-		
-		var results = [];
+    $.fn.propForm = function(options, param) {
+        
+        var results = [];
 
-		for(var i = 0; i < this.length; i++) {
+        for(var i = 0; i < this.length; i++) {
 
-			var self = $(this[i]);
+            var self = $(this[i]);
 
-			if(self.data('instance') == undefined && typeof options != 'string') {
+            if(self.data('instance') == undefined && typeof options != 'string') {
 
-				var instance = new pf(self, options);
-				self.data('instance', instance);
-				instance.private_methods.initialise();
+                var instance = new pf(self, options);
+                self.data('instance', instance);
+                instance.private_methods.initialise();
 
-			} else {
+            } else {
 
-				var instance = self.data('instance');
+                var instance = self.data('instance');
 
-				if(instance == undefined) {
+                if(instance == undefined) {
 
-					console.log('['+pluginName+' '+version+'] - You\'re trying to fire a method on an element with no instance!');
+                    console.log('['+pluginName+' '+version+'] - You\'re trying to fire a method on an element with no instance!');
 
-				} else if(instance.public_methods[options]) {
+                } else if(instance.public_methods[options]) {
 
-					if (this.length > 1) {
+                    if (this.length > 1) {
 
-						results.push(instance.public_methods[options](param));
+                        results.push(instance.public_methods[options](param));
 
-					} else {
+                    } else {
 
-						return instance.public_methods[options](param);
-						
-					}
-						
-				} else {
+                        return instance.public_methods[options](param);
+                        
+                    }
+                        
+                } else {
 
-					instance.private_methods.error(options + ' is not a defined method!');
+                    instance.private_methods.error(options + ' is not a defined method!');
 
-				}
+                }
 
-			}
+            }
 
-		}
+        }
 
-		return results;
+        return results;
 
-	}
+    }
 
-	function pf(self, options, param) {
+    function pf(self, options, param) {
 
-		var instance = this;
+        var instance = this;
 
-		instance.defaults = {
+        instance.defaults = {
 
-			wrapper : '.field-wrap',
-			tooltip : true,
-			compare : true,
-			errorClass : 'error',
-			ajax : true,
-			pending : null,
-			success : null
+            wrapper : '.field-wrap',
+            tooltip : true,
+            compare : true,
+            errorClass : 'error',
+            ajax : true,
+            pending : null,
+            success : null
 
-		}
+        }
 
-		var settings = $.extend(instance.defaults, options);
+        var settings = $.extend(instance.defaults, options);
 
-		var requiredElements = self.find('*[required]');
+        var requiredElements = self.find('*[required]');
 
-		instance.private_methods = {
-			
-			error: function(error) {
+        instance.private_methods = {
+            
+            error: function(error) {
 
-				if(console) console.warn('['+pluginName+' '+version+'] - ' + error);
+                if(console) console.warn('['+pluginName+' '+version+'] - ' + error);
 
-			},
+            },
 
-			initialise: function() {
+            initialise: function() {
 
-				self.attr('novalidate', 'true');
+                self.attr('novalidate', 'true');
 
-				self.submit(function(e) {
+                self.submit(function(e) {
 
-					self.removeClass('error-form');
+                    self.removeClass('error-form');
 
-					if(instance.public_methods.validate() == false) {
+                    if(instance.public_methods.validate() == false) {
 
-						self.addClass('error-form');
+                        self.addClass('error-form');
 
-						return false;
-						
-					} else if(settings.ajax) {
+                        return false;
+                        
+                    } else if(settings.ajax) {
 
-						instance.private_methods.ajax['submit'](e);
+                        instance.private_methods.ajax['submit'](e);
 
-					}
+                    }
 
-				});
+                });
 
-			},
+            },
 
-			ajax: {
+            ajax: {
 
-				submit: function(e) {
+                submit: function(e) {
 
-					e.preventDefault();
+                    e.preventDefault();
 
-					$.ajax({
+                    $.ajax({
 
-						url: self.attr('action') + '?notemplate',
-						data: self.serialize() + '&submitted=Send',
-						type: 'POST',
+                        url: self.attr('action'),
+                        data: self.serialize() + '&submitted=Send',
+                        type: 'POST',
 
-						beforeSend: function() {
+                        beforeSend: function() {
 
-							if(typeof settings.pending == 'function') {
+                            if(typeof settings.pending == 'function') {
 
-								settings.pending.call(self[0]);
+                                settings.pending.call(self[0]);
 
-							} else {
+                            } else {
 
-								var welcomeMessage = self.prev('.welcomeText');
-								
-								instance.public_methods.disable();
-								welcomeMessage.text('Working...');
-								
-							}
+                                var welcomeMessage = self.prev('.welcomeText');
+                                
+                                instance.public_methods.disable();
+                                welcomeMessage.text('Working...');
+                                
+                            }
 
-						},
+                        },
 
-						success: function(data) {
+                        success: function(data) {
 
-							try {
+                            try {
 
-								var form = $(data).find('#'+self.attr('id')),
-									successMessage = $(data).find('.successText'),
-									errorMessage = $(data).find('.errorText'),
-									welcomeMessage = self.prev('.welcomeText');
+                                var form = $(data).find('#'+self.attr('id')),
+                                    successMessage = $(data).find('.successText'),
+                                    errorMessage = $(data).find('.errorText'),
+                                    welcomeMessage = self.prev('.welcomeText');
 
-								if(welcomeMessage.length > 0) welcomeMessage.remove();									
-								
-								if(form.hasClass('form-error')) {
+                                if(welcomeMessage.length > 0) welcomeMessage.remove();                                  
+                                
+                                if(form.hasClass('form-error')) {
 
-									self.parent().find('.errorText').remove();
+                                    self.parent().find('.errorText').remove();
 
-									var required = form.find('.error'),
-										requiredField = required.children('input, select, textarea');
+                                    var required = form.find('.error'),
+                                        requiredField = required.children('input, select, textarea');
 
-									for(var i = 0; i < required.length; i++) {
+                                    for(var i = 0; i < required.length; i++) {
 
-										var element = $(requiredField[i]).attr('id');
-											element = self.find('#'+element)[0];
+                                        var element = $(requiredField[i]).attr('id');
+                                            element = self.find('#'+element)[0];
 
-										element.setAttributeNode(document.createAttribute('required'));
+                                        element.setAttributeNode(document.createAttribute('required'));
 
-									}
+                                    }
 
-									requiredElements = self.find('*[required]');
+                                    requiredElements = self.find('*[required]');
 
-									errorMessage.prependTo(self.parent());
-									instance.public_methods.enable();
-									instance.public_methods.validate();
+                                    errorMessage.prependTo(self.parent());
+                                    instance.public_methods.enable();
+                                    instance.public_methods.validate();
 
-								} else {
+                                } else {
 
-									if(typeof settings.success == 'function') {
+                                    if(typeof settings.success == 'function') {
 
-										settings.success.call(self, {
+                                        settings.success.call(self, {
 
-											data: data,
-											successMessage: successMessage,
-											errorMessage: errorMessage,
-											welcomeMessage: welcomeMessage
+                                            data: data,
+                                            successMessage: successMessage,
+                                            errorMessage: errorMessage,
+                                            welcomeMessage: welcomeMessage,
+                                            instance: instance
 
-										});
+                                        });
 
-									} else {
+                                    } else {
 
-										self.parent().find('.errorText').remove();
-										successMessage.prependTo(self.parent());
-										
-									}
+                                        self.parent().find('.errorText').remove();
+                                        successMessage.prependTo(self.parent());
+                                        
+                                    }
 
-								}
-								
-								if(successMessage.length === 0 && errorMessage.length === 0) throw('Passed with no success message...');
+                                }
+                                
+                                if(successMessage.length === 0 && errorMessage.length === 0) throw('Passed with no success message...');
 
-							} 
+                            } 
 
-							catch(e) {
+                            catch(e) {
 
-								instance.private_methods.error(e);
+                                instance.private_methods.error(e);
 
-							}
+                            }
 
-						}
+                        },
 
-					});
+                        error: function(data) {
 
-				}
+                            console.error(data);
 
-			},
+                        }
 
-			deriveFieldType: function(element) {
+                    });
 
-				var name = element.attr('name');
+                }
 
-				if(name.indexOf('email') > -1) {
+            },
 
-					return 'email';
+            deriveFieldType: function(element) {
 
-				} else if(name.indexOf('password') > -1) {
+                var name = element.attr('name');
 
-					return 'password';
+                if(name.indexOf('email') > -1) {
 
-				} else if(name.indexOf('name') > -1) {
+                    return 'email';
 
-					return 'name';
+                } else if(name.indexOf('password') > -1) {
 
-				} else {
+                    return 'password';
 
-					return name;
+                } else if(name.indexOf('name') > -1) {
 
-				}
+                    return 'name';
 
-			},
+                } else {
 
-			fieldLength: function(data) {
+                    return name;
 
-				switch(data) {
+                }
 
-					case 'email':
+            },
 
-						return 3;
+            fieldLength: function(data) {
 
-					break;
+                switch(data) {
 
-					case 'password':
+                    case 'email':
 
-						return 6;
+                        return 3;
 
-					break;
+                    break;
 
-					case 'name':
+                    case 'password':
 
-						return 1;
+                        return 6;
 
-					break;
+                    break;
 
-					case 'phone':
+                    case 'name':
 
-						return 5;
+                        return 1;
 
-					break;
+                    break;
 
-					default: 
+                    case 'phone':
 
-						return 0;
+                        return 5;
 
-					break;
+                    break;
 
-				}
+                    default: 
 
-			},
+                        return 0;
 
-			errorFields: function(element, type, error) {
+                    break;
 
-				element.closest(settings.wrapper).addClass(settings.errorClass);
+                }
 
-				if(type == 'SELECT') {
+            },
 
-					element.next('.select').addClass(settings.errorClass);
+            errorFields: function(element, type, error) {
 
-				} else if(type == 'checkbox' || type == 'radio') {
+                element.closest(settings.wrapper).addClass(settings.errorClass);
 
-					element.closest(settings.wrapper).find('label').addClass(settings.errorClass);
+                if(type == 'SELECT') {
 
-				} else {
+                    element.next('.select').addClass(settings.errorClass);
 
-					element.addClass(settings.errorClass);
-					
-				}
+                } else if(type == 'checkbox' || type == 'radio') {
 
-				if(settings.tooltip) {
+                    element.closest(settings.wrapper).find('label').addClass(settings.errorClass);
 
-					switch(error) {
+                } else {
 
-						case 'compare' :
+                    element.addClass(settings.errorClass);
+                    
+                }
 
-							var message = 'These fields need to match';
+                if(settings.tooltip) {
 
-						break;
+                    switch(error) {
 
-						case 'email' :
+                        case 'compare' :
 
-							var message = 'Please enter a valid email address';
+                            var message = 'These fields need to match';
 
-						break;
+                        break;
 
-						case 'check' : 
+                        case 'email' :
 
-							var message = 'Please check this field to continue';
+                            var message = 'Please enter a valid email address';
 
-						break;
+                        break;
 
-						case 'radio' :
+                        case 'check' : 
 
-							var message = 'Please check one of the marked fields';
+                            var message = 'Please check this field to continue';
 
-						break;
+                        break;
 
-						default : 
+                        case 'radio' :
 
-							var message = 'Please enter a valid value';
+                            var message = 'Please check one of the marked fields';
 
-						break;
+                        break;
 
-					}
+                        default : 
 
-					var parent = type != 'radio' ? element.closest(settings.wrapper) : element.closest(settings.wrapper).parent(),
-						tooltip = parent.find('.error-tooltip');
-					
-					message = type == 'SELECT' ? 'Please select an option' : message;
+                            var message = 'Please enter a valid value';
 
-					if(tooltip.size() <= 0) {
+                        break;
 
+                    }
 
-						$('<div />', {
+                    var parent = type != 'radio' ? element.closest(settings.wrapper) : element.closest(settings.wrapper).parent(),
+                        tooltip = parent.find('.error-tooltip');
+                    
+                    message = type == 'SELECT' ? 'Please select an option' : message;
 
-							'class' : 'error-tooltip',
-							'text' : message
+                    if(tooltip.size() <= 0) {
 
-						}).appendTo(parent);
 
-						tooltip = parent.find('.error-tooltip');
+                        $('<div />', {
 
-						setTimeout(function() {
+                            'class' : 'error-tooltip',
+                            'text' : message
 
-							tooltip.addClass('active');
+                        }).appendTo(parent);
 
-						}, 100);
+                        tooltip = parent.find('.error-tooltip');
 
-					} else {
+                        setTimeout(function() {
 
-						tooltip.text(message);
-						tooltip.addClass('active');
+                            tooltip.addClass('active');
 
-					}
+                        }, 100);
 
-					element.focus(function() {
+                    } else {
 
-						tooltip.removeClass('active');
+                        tooltip.text(message);
+                        tooltip.addClass('active');
 
-					});
+                    }
 
-					tooltip.click(function() {
+                    element.focus(function() {
 
-						element.focus();
+                        tooltip.removeClass('active');
 
-					});				
-					
-				}
+                    });
 
-			},
+                    tooltip.click(function() {
 
-			validFields: function(element, type) {
-				
-				element.closest(settings.wrapper).removeClass(settings.errorClass);
+                        element.focus();
 
-				if(type == 'SELECT') {
+                    });             
+                    
+                }
 
-					element.next('.select').removeClass(settings.errorClass);
+            },
 
-				}  else if(type == 'checkbox') {
+            validFields: function(element, type) {
+                
+                element.closest(settings.wrapper).removeClass(settings.errorClass);
 
-					element.parent().next('label').removeClass(settings.errorClass);
+                if(type == 'SELECT') {
 
-				} else {
+                    element.next('.select').removeClass(settings.errorClass);
 
-					element.removeClass(settings.errorClass);
-					
-				}
+                }  else if(type == 'checkbox') {
 
-				element.closest(settings.wrapper).find('.error-tooltip').remove();
+                    element.parent().find('label').removeClass(settings.errorClass);
 
-			},
+                } else {
 
-			validateEmail: function(email) {
+                    element.removeClass(settings.errorClass);
+                    
+                }
 
-				var validate = /^([^\s\\]+)@((\[[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+                element.closest(settings.wrapper).find('.error-tooltip').remove();
 
-			    if (validate.test(email)) {
+            },
 
-			        return true;
+            validateEmail: function(email) {
 
-			    } else {
+                var validate = /^([^\s\\]+)@((\[[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
 
-			        return false;
+                if (validate.test(email)) {
 
-			    }
+                    return true;
 
-			},
+                } else {
 
-			findFields: function(fields, search) {	
+                    return false;
 
-				var compare = [];
+                }
 
-				for(var i = 0; i < fields.length; i++) {
+            },
 
-					var field = $(fields[i]),
-						type = instance.private_methods.deriveFieldType(field);
+            findFields: function(fields, search) {  
 
-					if(type == search) {
+                var compare = [];
 
-						compare.push(field.attr('name'));
-						
-					}
+                for(var i = 0; i < fields.length; i++) {
 
-				}
+                    var field = $(fields[i]),
+                        type = instance.private_methods.deriveFieldType(field);
 
-				return compare;
+                    if(type == search) {
 
-			},
+                        compare.push(field.attr('name'));
+                        
+                    }
 
-			compareFields: function(element, type, fields) {
+                }
 
-				if(self.find('*[name="'+fields[0]+'"]').val() != self.find('*[name="'+fields[1]+'"]').val()) {
+                return compare;
 
-					instance.private_methods.errorFields(element, type, 'compare');
+            },
 
-				} else {
+            compareFields: function(element, type, fields) {
 
-					instance.private_methods.validFields(element, type);
+                if(self.find('*[name="'+fields[0]+'"]').val() != self.find('*[name="'+fields[1]+'"]').val()) {
 
-				}
+                    instance.private_methods.errorFields(element, type, 'compare');
 
-			}
+                } else {
 
-		}
+                    instance.private_methods.validFields(element, type);
 
-		instance.public_methods = {
+                }
 
-			validate: function() {
+            }
 
-				for(var i = 0; i < requiredElements.length; i++) {
+        }
 
-					var type = requiredElements[i].nodeName,
-						requiredElement = $(requiredElements[i]),
-						data = instance.private_methods.deriveFieldType(requiredElement);
+        instance.public_methods = {
 
-					if(requiredElement.is(':visible') && requiredElement.attr('disabled') != 'disabled' ) {
+            validate: function() {
 
-						if(requiredElement.val().length <= instance.private_methods.fieldLength(data)) {
+                for(var i = 0; i < requiredElements.length; i++) {
 
-							instance.private_methods.errorFields(requiredElement, type);
+                    var type = requiredElements[i].nodeName,
+                        requiredElement = $(requiredElements[i]),
+                        data = instance.private_methods.deriveFieldType(requiredElement);
 
-						} else if(data == 'email') {							
+                    if(requiredElement.is(':visible') && requiredElement.attr('disabled') != 'disabled' ) {
 
-							if(instance.private_methods.validateEmail(requiredElement.val()) == false) {
+                        if(requiredElement.val().length <= instance.private_methods.fieldLength(data)) {
 
-								instance.private_methods.errorFields(requiredElement, type, data);
-								
-							} else if(instance.private_methods.findFields(requiredElements, data).length > 1 && settings.compare == true) {
+                            instance.private_methods.errorFields(requiredElement, type);
 
-								instance.private_methods.compareFields(requiredElement, type, instance.private_methods.findFields(requiredElements, data));
+                        } else if(data == 'email') {                            
 
-							} else {
+                            if(instance.private_methods.validateEmail(requiredElement.val()) == false) {
 
-								instance.private_methods.validFields(requiredElement, type);
+                                instance.private_methods.errorFields(requiredElement, type, data);
+                                
+                            } else if(instance.private_methods.findFields(requiredElements, data).length > 1 && settings.compare == true) {
 
-							}
+                                instance.private_methods.compareFields(requiredElement, type, instance.private_methods.findFields(requiredElements, data));
 
-						} else if(data == 'password') {
+                            } else {
 
-							if(instance.private_methods.findFields(requiredElements, data).length > 1) {
+                                instance.private_methods.validFields(requiredElement, type);
 
-								instance.private_methods.compareFields(requiredElement, type, instance.private_methods.findFields(requiredElements, data));
+                            }
 
-							} else {
+                        } else if(data == 'password') {
 
-								instance.private_methods.validFields(requiredElement, type);
+                            if(instance.private_methods.findFields(requiredElements, data).length > 1) {
 
-							}
+                                instance.private_methods.compareFields(requiredElement, type, instance.private_methods.findFields(requiredElements, data));
 
-						} else if(requiredElement.attr('type') == 'checkbox' || requiredElement.attr('type') == 'radio') {
+                            } else {
 
-							switch(requiredElement.attr('type')) {
+                                instance.private_methods.validFields(requiredElement, type);
 
-								case 'checkbox':
+                            }
 
-									if(!(requiredElement.is(':checked'))) {
+                        } else if(requiredElement.attr('type') == 'checkbox' || requiredElement.attr('type') == 'radio') {
 
-										instance.private_methods.errorFields(requiredElement, 'checkbox', 'check');
+                            switch(requiredElement.attr('type')) {
 
-									} else {
+                                case 'checkbox':
 
-										instance.private_methods.validFields(requiredElement, 'checkbox');								
+                                    if(!(requiredElement.is(':checked'))) {
 
-									}									
+                                        instance.private_methods.errorFields(requiredElement, 'checkbox', 'check');
 
-								break;
+                                    } else {
 
-								case 'radio': 
+                                        instance.private_methods.validFields(requiredElement, 'checkbox');                              
 
-									var radioSet = $('*[name="' + requiredElement.attr('name') + '"]');
+                                    }                                   
 
-									if(!(radioSet.is(':checked'))) {
-										
-										instance.private_methods.errorFields(radioSet, 'radio', 'radio');
-										
-									} else {
+                                break;
 
-										instance.private_methods.validFields(radioSet, 'checkbox');	
+                                case 'radio': 
 
-									}
+                                    var radioSet = $('*[name="' + requiredElement.attr('name') + '"]');
 
-								break;
+                                    if(!(radioSet.is(':checked'))) {
+                                        
+                                        instance.private_methods.errorFields(radioSet, 'radio', 'radio');
+                                        
+                                    } else {
 
-							}
+                                        instance.private_methods.validFields(radioSet, 'checkbox'); 
 
-						} else {
+                                    }
 
-							instance.private_methods.validFields(requiredElement, type);
+                                break;
 
-						}
+                            }
 
-					} else {
+                        } else {
 
-						requiredElement.removeClass(settings.errorClass);
+                            instance.private_methods.validFields(requiredElement, type);
 
-					}
+                        }
 
-				}
+                    } else {
 
-				return self.find('.'+settings.errorClass).size() > 0 ? false : true;
+                        requiredElement.removeClass(settings.errorClass);
 
-			},
+                    }
 
-			updateSettings: function(updates) {
+                }
 
-				$.extend(settings, updates);
+                return self.find('.'+settings.errorClass).size() > 0 ? false : true;
 
-			},
+            },
 
-			enable: function() {
+            updateSettings: function(updates) {
 
-				self.fadeTo(300, 1.0);
-				self.find('input, textarea, select, button').removeAttr('disabled');
+                $.extend(settings, updates);
 
-			},
+            },
 
-			disable: function() {
+            enable: function() {
 
-				self.fadeTo(300, 0.2);
-				self.find('input, textarea, select, button').attr('disabled', 'disabled');
+                self.fadeTo(300, 1.0);
+                self.find('input, textarea, select, button').removeAttr('disabled');
 
-			}
+            },
 
-		}
+            disable: function() {
 
-	}
+                self.fadeTo(300, 0.2);
+                self.find('input, textarea, select, button').attr('disabled', 'disabled');
 
-	function slickForms() {
+            }
 
-		this.reSkin = function(element) {
+        }
 
-			if(element) {
+    }
 
-				core_funcs[element].handler();
-				
-			} else {
+    function logging = function(code, callback, multiple) {
+ 
+        var self = this,
+            progress = 0;
+     
+        self.init = function(e) {
+     
+            self.check(e.which);
+            
+        }
+     
+        self.check = function(key) {
+     
+            key == code[progress] ? progress++ : progress = 0;
+            if(progress == code.length) self.complete(); 
+     
+        }
+     
+        self.complete = function() {
+     
+            if(multiple !== true) window.onkeyup = null;
+            if(typeof callback == 'function') callback.call();
+     
+        }
+     
+        window.onkeyup = self.init;
+     
+    }
 
-				core_funcs.initialise();
+    function slickForms(options) {
 
-			}
+        this.reSkin = function(element) {
 
-			return 'All wrapped up, slick!';
+            if(element) {
 
-		}
+                core_funcs[element].handler();
+                
+            } else {
 
-		var core_funcs = {
+                core_funcs.initialise();
 
-			initialise: function() {
+            }
 
-				for(var type in core_funcs) {
+            return 'All wrapped up, slick!';
 
-					if(core_funcs[type]['handler'])	core_funcs[type]['handler']();
+        }
 
-				}
+        var core_funcs = {
 
-			},
+            initialise: function() {
 
-			select: {
+                for(var type in core_funcs) {
 
-				handler: function() {
+                    if(core_funcs[type]['handler'] && options[type]) core_funcs[type]['handler']();
 
-					var elements = document.getElementsByTagName('select');
+                }
 
-					for (var i = 0; i < elements.length; i++) {
+            },
 
-						if(elements[i].parentNode.classList ? (!elements[i].parentNode.classList.contains('select-wrap')) : (!new RegExp('(^| )' + 'select-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className))) core_funcs['select'].wrap(elements[i]);
+            select: {
 
-						if(elements[i].getAttribute('data-label')) {
+                handler: function() {
 
-							core_funcs['select'].setLabel(elements[i], elements[i].getAttribute('data-label'));
+                    var elements = document.getElementsByTagName('select');
 
-						} else {
+                    for (var i = 0; i < elements.length; i++) {
 
-							core_funcs['select'].check(elements[i]);
+                        if(elements[i].parentNode.classList ? (!elements[i].parentNode.classList.contains('select-wrap')) : (!new RegExp('(^| )' + 'select-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className))) core_funcs['select'].wrap(elements[i]);
 
-						}
-						core_funcs['select'].bind(elements[i]);
+                        if(elements[i].getAttribute('data-label')) {
 
-					}
+                            core_funcs['select'].setLabel(elements[i], elements[i].getAttribute('data-label'));
 
-				},
+                        } else {
 
-				wrap: function(element) {
+                            core_funcs['select'].check(elements[i]);
 
-					element.outerHTML = '<div class="select-wrap">'+element.outerHTML+'<div class="select">'+element.value+'</div></div>';
+                        }
+                        core_funcs['select'].bind(elements[i]);
 
-				},
+                    }
 
-				bind: function(element) {
+                },
 
-					element.onchange = function() {
+                wrap: function(element) {
 
-						core_funcs['select'].check(element);
+                    element.outerHTML = '<div class="select-wrap">'+element.outerHTML+'<div class="select">'+element.value+'</div></div>';
 
-					}
+                },
 
-				},
+                bind: function(element) {
 
-				check: function(element) {
+                    element.onchange = function() {
 
-					var elementValue = element.value,
-						selectedOption = element.getElementsByTagName('option');
+                        core_funcs['select'].check(element);
 
-					for(var i = 0; i < selectedOption.length; i++) {
+                    }
 
-						if(selectedOption[i].value != elementValue) {
+                },
 
-							continue;
-							
-						} else {
+                check: function(element) {
 
-							var optionText = selectedOption[i].textContent || selectedOption[i].innerText;
+                    var elementValue = element.value,
+                        selectedOption = element.getElementsByTagName('option');
 
-						}
+                    for(var i = 0; i < selectedOption.length; i++) {
 
-					}
+                        if(selectedOption[i].value != elementValue) {
 
-					core_funcs['select'].setLabel(element, optionText);
+                            continue;
+                            
+                        } else {
 
-				},
+                            var optionText = selectedOption[i].textContent || selectedOption[i].innerText;
 
-				setLabel: function(element, value) {
+                        }
 
-					element.parentNode.querySelectorAll('.select')[0].innerHTML = value;
-					
-				} 
+                    }
 
-			},
+                    core_funcs['select'].setLabel(element, optionText);
 
-			checkbox: {
+                },
 
-				handler: function() {
+                setLabel: function(element, value) {
 
-					var elements = document.getElementsByTagName('input');
+                    element.parentNode.querySelectorAll('.select')[0].innerHTML = value;
+                    
+                } 
 
-					for (var i = 0; i < elements.length; i++) {
+            },
 
-						if((elements[i].getAttribute('type') != 'checkbox') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('checkbox-wrap')) : (new RegExp('(^| )' + 'checkbox-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;
+            checkbox: {
 
-						core_funcs['checkbox'].wrap(elements[i]);
-						core_funcs['checkbox'].check(elements[i]);
-						core_funcs['checkbox'].bind(elements[i]);
+                handler: function() {
 
-					}
+                    var elements = document.getElementsByTagName('input');
 
-				},
+                    for (var i = 0; i < elements.length; i++) {
 
-				wrap: function(element) {
+                        if((elements[i].getAttribute('type') != 'checkbox') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('checkbox-wrap')) : (new RegExp('(^| )' + 'checkbox-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;
 
-					element.outerHTML = '<div class="checkbox-wrap">'+element.outerHTML+'<div class="checkbox-mark"></div></div>';
+                        core_funcs['checkbox'].wrap(elements[i]);
+                        core_funcs['checkbox'].check(elements[i]);
+                        core_funcs['checkbox'].bind(elements[i]);
 
-				},
+                    }
 
-				bind: function(element) {
+                },
 
-					element.onchange = function() {
+                wrap: function(element) {
 
-						core_funcs['checkbox'].check(element);
+                    element.outerHTML = '<div class="checkbox-wrap">'+element.outerHTML+'<div class="checkbox-mark"></div></div>';
 
-					}
+                },
 
-				},
+                bind: function(element) {
 
-				check: function(element) {
+                    element.onchange = function() {
 
-					var marker = element.parentNode.querySelectorAll('.checkbox-mark')[0];
+                        core_funcs['checkbox'].check(element);
 
-					if(element.checked) {
+                    }
 
-						marker.classList.add('active');
+                },
 
-					} else {
+                check: function(element) {
 
-						marker.classList.remove('active');
+                    var marker = element.parentNode.querySelectorAll('.checkbox-mark')[0];
 
-					}
+                    if(element.checked) {
 
-				} 
+                        marker.classList.add('active');
 
-			},
+                    } else {
 
-			radio: {
+                        marker.classList.remove('active');
 
-				handler: function() {
+                    }
 
-					var elements = document.getElementsByTagName('input');
+                } 
 
-					for(var i = 0; i < elements.length; i++) {
+            },
 
-						if((elements[i].getAttribute('type') != 'radio') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('radio-wrap')) : (new RegExp('(^| )' + 'radio-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;						
+            radio: {
 
-						core_funcs['radio'].wrap(elements[i]);
-						core_funcs['radio'].check(elements[i]);
-						core_funcs['radio'].bind(elements[i]);
+                handler: function() {
 
-					}
+                    var elements = document.getElementsByTagName('input');
 
-				},
+                    for(var i = 0; i < elements.length; i++) {
 
-				wrap: function(element) {
+                        if((elements[i].getAttribute('type') != 'radio') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('radio-wrap')) : (new RegExp('(^| )' + 'radio-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;                     
 
-					element.outerHTML = '<div class="radio-wrap">'+element.outerHTML+'<div class="radio-mark"></div></div>';
+                        core_funcs['radio'].wrap(elements[i]);
+                        core_funcs['radio'].check(elements[i]);
+                        core_funcs['radio'].bind(elements[i]);
 
-				},
+                    }
 
-				bind: function(element) {
+                },
 
-					var elementGroup = document.getElementsByName(element.getAttribute('name'));
-					
-					element.onchange = function() {
+                wrap: function(element) {
 
-						for(var i = 0; i < elementGroup.length; i++) {
-							
-							core_funcs['radio'].check(elementGroup[i]);
+                    element.outerHTML = '<div class="radio-wrap">'+element.outerHTML+'<div class="radio-mark"></div></div>';
 
-						}
+                },
 
-					}
+                bind: function(element) {
 
-				}, 
+                    var elementGroup = document.getElementsByName(element.getAttribute('name'));
+                    
+                    element.onchange = function() {
 
-				check: function(element) {
+                        for(var i = 0; i < elementGroup.length; i++) {
+                            
+                            core_funcs['radio'].check(elementGroup[i]);
 
-					var marker = element.parentNode.querySelectorAll('.radio-mark')[0];
+                        }
 
-					if(element.checked) {
+                    }
 
-						marker.classList.add('active');
+                }, 
 
-					} else {
+                check: function(element) {
 
-						marker.classList.remove('active');
+                    var marker = element.parentNode.querySelectorAll('.radio-mark')[0];
 
-					}						
+                    if(element.checked) {
 
-				}
+                        marker.classList.add('active');
 
-			},
+                    } else {
 
-			file: {
+                        marker.classList.remove('active');
 
-				handler: function() {
+                    }                       
 
-					var elements = document.getElementsByTagName('input');
+                }
 
-					for (var i = 0; i < elements.length; i++) {
+            },
 
-						if((elements[i].getAttribute('type') != 'file') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('file-wrap')) : (new RegExp('(^| )' + 'file-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;
+            file: {
 
-						core_funcs['file'].wrap(elements[i]);
-						core_funcs['file'].check(elements[i]);
-						core_funcs['file'].bind(elements[i]);
+                handler: function() {
 
-					}
+                    var elements = document.getElementsByTagName('input');
 
-				},
+                    for (var i = 0; i < elements.length; i++) {
 
-				wrap: function(element) {
+                        if((elements[i].getAttribute('type') != 'file') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('file-wrap')) : (new RegExp('(^| )' + 'file-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;
 
-					element.outerHTML = '<div class="file-wrap">'+element.outerHTML+'<div class="file-button">Choose file(s)</div><div class="file-label"></div></div>';
+                        core_funcs['file'].wrap(elements[i]);
+                        core_funcs['file'].check(elements[i]);
+                        core_funcs['file'].bind(elements[i]);
 
-				},
+                    }
 
-				bind: function(element) {
+                },
 
-					element.onchange = function() {
+                wrap: function(element) {
 
-						core_funcs['file'].check(element);
+                    element.outerHTML = '<div class="file-wrap">'+element.outerHTML+'<div class="file-button">Choose file(s)</div><div class="file-label"></div></div>';
 
-					}
+                },
 
-				},
+                bind: function(element) {
 
-				check: function(element) {
+                    element.onchange = function() {
 
-					var label = element.parentNode.querySelectorAll('.file-label')[0],
-						button = element.parentNode.querySelectorAll('.file-button')[0];
+                        core_funcs['file'].check(element);
 
-					if(!element.value) {
+                    }
 
-						label.innerHTML = 'Please select a file(s)';
-						button.innerHTML = 'Choose file(s)';
+                },
 
-					} else {
+                check: function(element) {
 
-						label.innerHTML = '';
-						button.innerHTML = (element.files.length > 1 ? 'Change file(s)' : 'Change file');
+                    var label = element.parentNode.querySelectorAll('.file-label')[0],
+                        button = element.parentNode.querySelectorAll('.file-button')[0];
 
-						for(var i = 0; i < element.files.length; i++) {
+                    if(!element.value) {
 
-							var fileLabel = document.createElement('span');
-							
-							fileLabel.innerHTML = element.files[i].name + (i != element.files.length -1 ? ', ' : '');
+                        label.innerHTML = 'Please select a file(s)';
+                        button.innerHTML = 'Choose file(s)';
 
-							label.appendChild(fileLabel);
+                    } else {
 
-						}
-						
-					}
+                        label.innerHTML = '';
+                        button.innerHTML = (element.files.length > 1 ? 'Change file(s)' : 'Change file');
 
-				}
+                        for(var i = 0; i < element.files.length; i++) {
 
-			}
+                            var fileLabel = document.createElement('span');
+                            
+                            fileLabel.innerHTML = element.files[i].name + (i != element.files.length -1 ? ', ' : '');
 
-		}
+                            label.appendChild(fileLabel);
 
-		core_funcs.initialise();
+                        }
+                        
+                    }
 
-	}
+                }
 
-	window.slickForms = slickForms;
-	
+            }
+
+        }
+
+        core_funcs.initialise();
+
+    }
+
+    window.slickForms = slickForms;
+    
 })();
 
 $(document).ready(function() {
 
-	window.slick = new slickForms();
-
-	$('form').propForm();
+    $('form').propForm();
 
 });
