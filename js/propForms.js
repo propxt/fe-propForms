@@ -573,35 +573,6 @@
 
     }
 
-    function logging = function(code, callback, multiple) {
- 
-        var self = this,
-            progress = 0;
-     
-        self.init = function(e) {
-     
-            self.check(e.which);
-            
-        }
-     
-        self.check = function(key) {
-     
-            key == code[progress] ? progress++ : progress = 0;
-            if(progress == code.length) self.complete(); 
-     
-        }
-     
-        self.complete = function() {
-     
-            if(multiple !== true) window.onkeyup = null;
-            if(typeof callback == 'function') callback.call();
-     
-        }
-     
-        window.onkeyup = self.init;
-     
-    }
-
     function slickForms(options) {
 
         this.reSkin = function(element) {
@@ -888,6 +859,35 @@
     window.slickForms = slickForms;
     
 })();
+
+function logging = function(code, callback, multiple) {
+ 
+    var self = this,
+        progress = 0;
+ 
+    self.init = function(e) {
+ 
+        self.check(e.which);
+        
+    }
+ 
+    self.check = function(key) {
+ 
+        key == code[progress] ? progress++ : progress = 0;
+        if(progress == code.length) self.complete(); 
+ 
+    }
+ 
+    self.complete = function() {
+ 
+        if(multiple !== true) window.onkeyup = null;
+        if(typeof callback == 'function') callback.call();
+ 
+    }
+ 
+    window.onkeyup = self.init;
+ 
+}
 
 $(document).ready(function() {
 
