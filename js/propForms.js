@@ -860,7 +860,7 @@
     
 })();
 
-function logging = function(code, callback, multiple) {
+var logging = function(code, callback, multiple) {
  
     var self = this,
         progress = 0;
