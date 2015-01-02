@@ -701,27 +701,27 @@
 
                 bind: function(element) {
 
-                    element.onchange = function() {
+                    $(element).on('change', function() {
 
                         core_funcs['checkbox'].check(element);
 
-                    }
+                    });
 
                 },
 
                 check: function(element) {
 
-                    var marker = element.parentNode.querySelectorAll('.checkbox-mark')[0];
+                    var marker = $(element).parent().find('.checkbox-mark');
 
-                    if(element.checked) {
+                    if($(element).is(':checked')) {
 
-                        marker.classList.add('active');
+                        marker.addClass('active');
 
                     } else {
 
-                        marker.classList.remove('active');
+                        marker.removeClass('active');
 
-                    }
+                    }  
 
                 } 
 
@@ -773,11 +773,11 @@
 
                     if(element.checked) {
 
-                        marker.classList.add('active');
+                        marker.classList ? marker.classList.add('active') : marker.className += ' active';
 
                     } else {
 
-                        marker.classList.remove('active');
+                        marker.classList ? marker.classList.remove('active') :  marker.className = marker.className.replace(new RegExp('active' + className.split(' ').join('|') + 'active', 'gi'), ' ');
 
                     }                       
 
