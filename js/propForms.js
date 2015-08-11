@@ -888,9 +888,3 @@ var logging = function(code, callback, multiple) {
     window.onkeyup = self.init;
  
 }
-
-$(document).ready(function() {
-
-    $('form').propForm();
-
-});
