@@ -1,6 +1,11 @@
 propForms
 ============
 
+v1.0.2 Update
+---
+
+Moved initialisation out of the propForms.js file and used jQuery to style up checkboxes in slickForms.
+
 propForms is a complete solution for all of our form needs! It combines form styling and validation into one neat package that handles every form on the site without the need for initialisation.
 
 Implementation
