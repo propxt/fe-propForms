@@ -288,6 +288,10 @@
 
                     element.closest(settings.wrapper).find('label').addClass(settings.errorClass);
 
+                } else if(element.hasClass('file')) {
+
+                    element.parent().addClass(settings.errorClass);
+
                 } else {
 
                     element.addClass(settings.errorClass);
