@@ -388,7 +388,11 @@
 
                     element.next('.select').removeClass(settings.errorClass);
 
-                }  else if(type == 'checkbox') {
+                } else if(element.hasClass('file')) {
+
+                    element.parent().removeClass(settings.errorClass); 
+
+                } else if(type == 'checkbox') {
 
                     element.parent().find('label').removeClass(settings.errorClass);
 
