@@ -135,14 +135,16 @@
                         },
 
                         success: function(data) {
-
+                            
                             try {
 
                                 var form = $(data).find('#'+self.attr('id')),
                                     successMessage = $(data).find('.successText'),
                                     errorMessage = $(data).find('.errorText'),
                                     welcomeMessage = self.prev('.welcomeText');
-
+                                                                
+                                ga('send', 'event', 'Form', 'Success', self.attr('id'));
+                                
                                 if(welcomeMessage.length > 0) welcomeMessage.remove();                                  
                                 
                                 if(form.hasClass('form-error')) {
@@ -196,6 +198,8 @@
 
                             catch(e) {
 
+                                ga('send', 'event', 'Form', 'Error', self.attr('id'));
+                                
                                 instance.private_methods.error(e);
 
                             }
@@ -205,6 +209,8 @@
                         error: function(data) {
 
                             console.error(data);
+                            
+                            ga('send', 'event', 'Form', 'Error', self.attr('id'));
 
                         }
 
