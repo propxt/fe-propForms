@@ -141,14 +141,14 @@
                                 var form = $(data).find('#'+self.attr('id')),
                                     successMessage = $(data).find('.successText'),
                                     errorMessage = $(data).find('.errorText'),
-                                    welcomeMessage = self.prev('.welcomeText');
-                                                                
-                                ga('send', 'event', 'Form', 'Success', self.attr('id'));
+                                    welcomeMessage = self.prev('.welcomeText');                                                                
                                 
                                 if(welcomeMessage.length > 0) welcomeMessage.remove();                                  
                                 
                                 if(form.hasClass('form-error')) {
 
+                                    ga('send', 'event', 'Form', 'Server Validation Error', self.attr('id'), true);
+                                    
                                     self.parent().find('.errorText').remove();
 
                                     var required = form.find('.error'),
@@ -171,6 +171,8 @@
 
                                 } else {
 
+                                    ga('send', 'event', 'Form', 'Success', self.attr('id'), true);
+                                    
                                     if(typeof settings.success == 'function') {
 
                                         settings.success.call(self, {
@@ -192,13 +194,17 @@
 
                                 }
                                 
-                                if(successMessage.length === 0 && errorMessage.length === 0) throw('Passed with no success message...');
+                                if(successMessage.length === 0 && errorMessage.length === 0) {
+                                    
+                                    console.log('Passed with no success message...');
+                                    
+                                }
 
                             } 
 
                             catch(e) {
 
-                                ga('send', 'event', 'Form', 'Error', self.attr('id'));
+                                ga('send', 'event', 'Form', 'Fatal Error', self.attr('id'), true);
                                 
                                 instance.private_methods.error(e);
 
@@ -210,7 +216,7 @@
 
                             console.error(data);
                             
-                            ga('send', 'event', 'Form', 'Error', self.attr('id'));
+                            ga('send', 'event', 'Form', 'Ajax Request Error', self.attr('id'), true);
 
                         }
 
