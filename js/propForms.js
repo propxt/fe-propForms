@@ -406,7 +406,7 @@
 
                 } else if(type == 'checkbox') {
 
-                    element.parent().find('label').removeClass(settings.errorClass);
+                    element.closest(settings.wrapper).find('label').removeClass(settings.errorClass);
 
                 } else {
 
