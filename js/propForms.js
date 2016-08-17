@@ -371,7 +371,7 @@
                     
                     message = type == 'SELECT' ? 'Please select an option' : message;
 
-                    if(tooltip.size() <= 0) {
+                    if(tooltip.length <= 0) {
 
                         $('<div />', {
 
@@ -584,7 +584,7 @@
 
                 }
 
-                return self.find('.'+settings.errorClass).size() > 0 ? false : true;
+                return self.find('.'+settings.errorClass).length > 0 ? false : true;
 
             },
 
