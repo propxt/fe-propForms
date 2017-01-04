@@ -135,6 +135,8 @@
                         },
 
                         success: function(data) {
+
+                            var formName = self.attr('id').replace(/-/g, ' ').toLowerCase();
                             
                             try {
 
@@ -147,7 +149,7 @@
                                 
                                 if(form.hasClass('form-error')) {
 
-                                    ga('send', 'event', 'Form', 'Server Validation Error', self.attr('id'), true);
+                                    ga && ga('send', 'event', 'form (' + formName + ')', 'server validation error', formName);
                                     
                                     self.parent().find('.errorText').remove();
 
@@ -171,7 +173,7 @@
 
                                 } else {
 
-                                    ga('send', 'event', 'Form', 'Success', self.attr('id'), true);
+                                    ga && ga('send', 'event', 'form (' + formName + ')', 'successful submission', formName);
                                     
                                     if(typeof settings.success == 'function') {
 
@@ -204,7 +206,7 @@
 
                             catch(e) {
 
-                                ga('send', 'event', 'Form', 'Fatal Error', self.attr('id'), true);
+                                ga && ga('send', 'event', 'form (' + formName + ')', 'fatal error', formName);
                                 
                                 instance.private_methods.error(e);
 
@@ -214,9 +216,11 @@
 
                         error: function(data) {
 
+                            var formName = self.attr('id').replace(/-/g, ' ').toLowerCase();
+
                             console.error(data);
                             
-                            ga('send', 'event', 'Form', 'Ajax Request Error', self.attr('id'), true);
+                            ga && ga('send', 'event', 'form (' + formName + ')', 'ajax request error', formName);
 
                         }
 
@@ -292,22 +296,41 @@
 
                 element.closest(settings.wrapper).addClass(settings.errorClass);
 
+                var formName = element.closest('form').attr('id').replace(/-/g, ' ').toLowerCase(),
+                    fieldName = element.attr('name').replace(/-/g, ' ').toLowerCase();
+
                 if(type == 'SELECT') {
 
                     element.next('.select').addClass(settings.errorClass);
+
+                    ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (select)');
 
                 } else if(type == 'checkbox' || type == 'radio') {
 
                     element.closest(settings.wrapper).find('label').addClass(settings.errorClass);
 
+                    if(type == 'checkbox') {
+
+                        ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (checkbox)');
+
+                    } else if(type == 'radio') {
+
+                        ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (radio)');
+
+                    }
+
                 } else if(element.hasClass('file')) {
 
                     element.parent().addClass(settings.errorClass);
 
+                    ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (file)');
+
                 } else {
 
                     element.addClass(settings.errorClass);
-                    
+
+                    ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (other)');
+
                 }
 
                 if(settings.tooltip) {
@@ -352,7 +375,6 @@
                     message = type == 'SELECT' ? 'Please select an option' : message;
 
                     if(tooltip.size() <= 0) {
-
 
                         $('<div />', {
 
