@@ -67,7 +67,7 @@
             pending : null,
             success : null
 
-        }
+        };
 
         var settings = $.extend(instance.defaults, options);
 
@@ -84,6 +84,8 @@
             initialise: function() {
 
                 self.attr('novalidate', 'true');
+
+                self.formName = self.attr('id').replace(/-/g, ' ').toLowerCase();
 
                 self.submit(function(e) {
 
@@ -136,8 +138,6 @@
 
                         success: function(data) {
 
-                            var formName = self.attr('id').replace(/-/g, ' ').toLowerCase();
-                            
                             try {
 
                                 var form = $(data).find('#'+self.attr('id')),
@@ -145,11 +145,11 @@
                                     errorMessage = $(data).find('.errorText'),
                                     welcomeMessage = self.prev('.welcomeText');                                                                
                                 
-                                if(welcomeMessage.length > 0) welcomeMessage.remove();                                  
-                                
+                                if(welcomeMessage.length > 0) welcomeMessage.remove();
+
                                 if(form.hasClass('form-error')) {
 
-                                    ga && ga('send', 'event', 'form (' + formName + ')', 'server validation error', formName);
+                                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'server validation error', self.formName);
                                     
                                     self.parent().find('.errorText').remove();
 
@@ -173,7 +173,7 @@
 
                                 } else {
 
-                                    ga && ga('send', 'event', 'form (' + formName + ')', 'successful submission', formName);
+                                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'successful submission', self.formName);
                                     
                                     if(typeof settings.success == 'function') {
 
@@ -206,7 +206,7 @@
 
                             catch(e) {
 
-                                ga && ga('send', 'event', 'form (' + formName + ')', 'fatal error', formName);
+                                ga && ga('send', 'event', 'form (' + self.formName + ')', 'fatal error', self.formName);
                                 
                                 instance.private_methods.error(e);
 
@@ -216,11 +216,9 @@
 
                         error: function(data) {
 
-                            var formName = self.attr('id').replace(/-/g, ' ').toLowerCase();
-
                             console.error(data);
                             
-                            ga && ga('send', 'event', 'form (' + formName + ')', 'ajax request error', formName);
+                            ga && ga('send', 'event', 'form (' + self.formName + ')', 'ajax request error', self.formName);
 
                         }
 
@@ -296,14 +294,13 @@
 
                 element.closest(settings.wrapper).addClass(settings.errorClass);
 
-                var formName = element.closest('form').attr('id').replace(/-/g, ' ').toLowerCase(),
-                    fieldName = element.attr('name').replace(/-/g, ' ').toLowerCase();
+                var fieldName = element.attr('name').replace(/-/g, ' ').toLowerCase();
 
                 if(type == 'SELECT') {
 
                     element.next('.select').addClass(settings.errorClass);
 
-                    ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (select)');
+                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (select)');
 
                 } else if(type == 'checkbox' || type == 'radio') {
 
@@ -311,11 +308,11 @@
 
                     if(type == 'checkbox') {
 
-                        ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (checkbox)');
+                        ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (checkbox)');
 
                     } else if(type == 'radio') {
 
-                        ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (radio)');
+                        ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (radio)');
 
                     }
 
@@ -323,13 +320,13 @@
 
                     element.parent().addClass(settings.errorClass);
 
-                    ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (file)');
+                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (file)');
 
                 } else {
 
                     element.addClass(settings.errorClass);
 
-                    ga && ga('send', 'event', 'form (' + formName + ')', 'client validation error', fieldName + ' (other)');
+                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (other)');
 
                 }
 
