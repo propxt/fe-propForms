@@ -67,7 +67,7 @@
             pending : null,
             success : null
 
-        }
+        };
 
         var settings = $.extend(instance.defaults, options);
 
@@ -84,6 +84,8 @@
             initialise: function() {
 
                 self.attr('novalidate', 'true');
+
+                self.formName = self.attr('id').replace(/-/g, ' ').toLowerCase();
 
                 self.submit(function(e) {
 
@@ -135,7 +137,7 @@
                         },
 
                         success: function(data) {
-                            
+
                             try {
 
                                 var form = $(data).find('#'+self.attr('id')),
@@ -143,11 +145,11 @@
                                     errorMessage = $(data).find('.errorText'),
                                     welcomeMessage = self.prev('.welcomeText');                                                                
                                 
-                                if(welcomeMessage.length > 0) welcomeMessage.remove();                                  
-                                
+                                if(welcomeMessage.length > 0) welcomeMessage.remove();
+
                                 if(form.hasClass('form-error')) {
 
-                                    ga('send', 'event', 'Form', 'Server Validation Error', self.attr('id'), true);
+                                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'server validation error', self.formName);
                                     
                                     self.parent().find('.errorText').remove();
 
@@ -171,7 +173,7 @@
 
                                 } else {
 
-                                    ga('send', 'event', 'Form', 'Success', self.attr('id'), true);
+                                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'successful submission', self.formName);
                                     
                                     if(typeof settings.success == 'function') {
 
@@ -204,7 +206,7 @@
 
                             catch(e) {
 
-                                ga('send', 'event', 'Form', 'Fatal Error', self.attr('id'), true);
+                                ga && ga('send', 'event', 'form (' + self.formName + ')', 'fatal error', self.formName);
                                 
                                 instance.private_methods.error(e);
 
@@ -216,7 +218,7 @@
 
                             console.error(data);
                             
-                            ga('send', 'event', 'Form', 'Ajax Request Error', self.attr('id'), true);
+                            ga && ga('send', 'event', 'form (' + self.formName + ')', 'ajax request error', self.formName);
 
                         }
 
@@ -292,22 +294,40 @@
 
                 element.closest(settings.wrapper).addClass(settings.errorClass);
 
+                var fieldName = element.attr('name').replace(/-/g, ' ').toLowerCase();
+
                 if(type == 'SELECT') {
 
                     element.next('.select').addClass(settings.errorClass);
+
+                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (select)');
 
                 } else if(type == 'checkbox' || type == 'radio') {
 
                     element.closest(settings.wrapper).find('label').addClass(settings.errorClass);
 
+                    if(type == 'checkbox') {
+
+                        ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (checkbox)');
+
+                    } else if(type == 'radio') {
+
+                        ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (radio)');
+
+                    }
+
                 } else if(element.hasClass('file')) {
 
                     element.parent().addClass(settings.errorClass);
 
+                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (file)');
+
                 } else {
 
                     element.addClass(settings.errorClass);
-                    
+
+                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (other)');
+
                 }
 
                 if(settings.tooltip) {
@@ -352,7 +372,6 @@
                     message = type == 'SELECT' ? 'Please select an option' : message;
 
                     if(tooltip.size() <= 0) {
-
 
                         $('<div />', {
 
