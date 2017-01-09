@@ -728,7 +728,7 @@
 
                     for (var i = 0; i < elements.length; i++) {
 
-                        if((elements[i].getAttribute('type') != 'checkbox') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('checkbox-wrap')) : (new RegExp('(^| )' + 'checkbox-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;
+                        if((elements[i].getAttribute('type') != 'checkbox')|| elements[i].getAttribute('data-no-wrap') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('checkbox-wrap')) : (new RegExp('(^| )' + 'checkbox-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;
 
                         core_funcs['checkbox'].wrap(elements[i]);
                         core_funcs['checkbox'].check(elements[i]);
@@ -780,7 +780,7 @@
 
                     for(var i = 0; i < elements.length; i++) {
 
-                        if((elements[i].getAttribute('type') != 'radio') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('radio-wrap')) : (new RegExp('(^| )' + 'radio-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;                     
+                        if((elements[i].getAttribute('type') != 'radio') || elements[i].getAttribute('data-no-wrap') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('radio-wrap')) : (new RegExp('(^| )' + 'radio-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;                     
 
                         core_funcs['radio'].wrap(elements[i]);
                         core_funcs['radio'].check(elements[i]);
