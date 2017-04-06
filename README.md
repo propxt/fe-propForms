@@ -37,7 +37,8 @@ The default options are as follows:
 	errorClass : 'error',
 	ajax : true
 	pending : null,
-	success : null
+	success : null,
+	trackers: null
 
 * wrapper - The wrapper class for your fields
 * tooltip - Do you want tooltips to appear? true or false
@@ -46,13 +47,15 @@ The default options are as follows:
 * ajax - Do you want the form to submit via ajax? true or false
 * pending - A custom function that will get fired as the form is pending submission.
 * success - A custom function that will get fired if the form passes validation.
+* trackers - Pass namespaces for multiple GA trackers
 
 All of the options can be updated with the 'updateSettings' method in your main scripts file for example.
 
 	$('#random-form-selector').propForm('updateSettings', {
 
 		wrapper : '.new-wrapper',
-		tooltip: false
+		tooltip: false,
+		trackers: ['0', '1', '2']
 
 	});
 
