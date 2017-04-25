@@ -65,7 +65,8 @@
             errorClass : 'error',
             ajax : true,
             pending : null,
-            success : null
+            success : null,
+            trackers: null
 
         };
 
@@ -138,6 +139,9 @@
 
                         success: function(data) {
 
+                            var category = 'form (' + self.formName + ')',
+                                label = self.formName;
+
                             try {
 
                                 var form = $(data).find('#'+self.attr('id')),
@@ -149,7 +153,7 @@
 
                                 if(form.hasClass('form-error')) {
 
-                                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'server validation error', self.formName);
+                                    instance.public_methods.sendEvent(category, 'server validation error', label);
                                     
                                     self.parent().find('.errorText').remove();
 
@@ -173,7 +177,7 @@
 
                                 } else {
 
-                                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'successful submission', self.formName);
+                                    instance.public_methods.sendEvent(category, 'successful submission', label);
                                     
                                     if(typeof settings.success == 'function') {
 
@@ -206,7 +210,7 @@
 
                             catch(e) {
 
-                                ga && ga('send', 'event', 'form (' + self.formName + ')', 'fatal error', self.formName);
+                                instance.public_methods.sendEvent(category, 'fatal error', label);
                                 
                                 instance.private_methods.error(e);
 
@@ -218,7 +222,7 @@
 
                             console.error(data);
                             
-                            ga && ga('send', 'event', 'form (' + self.formName + ')', 'ajax request error', self.formName);
+                            instance.public_methods.sendEvent(category, 'ajax request error', label);
 
                         }
 
@@ -294,13 +298,16 @@
 
                 element.closest(settings.wrapper).addClass(settings.errorClass);
 
-                var fieldName = element.attr('name').replace(/-/g, ' ').toLowerCase();
+                var fieldName = element.attr('name').replace(/-/g, ' ').toLowerCase(),
+                    category = 'form (' + self.formName + ')',
+                    action = 'client validation error';
 
                 if(type == 'SELECT') {
 
                     element.next('.select').addClass(settings.errorClass);
 
-                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (select)');
+                    instance.public_methods.sendEvent(category, action, fieldName + ' (select)');
+
 
                 } else if(type == 'checkbox' || type == 'radio') {
 
@@ -308,11 +315,11 @@
 
                     if(type == 'checkbox') {
 
-                        ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (checkbox)');
+                        instance.public_methods.sendEvent(category, action, fieldName + ' (checkbox)');
 
                     } else if(type == 'radio') {
 
-                        ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (radio)');
+                        instance.public_methods.sendEvent(category, action, fieldName + ' (radio)');
 
                     }
 
@@ -320,13 +327,13 @@
 
                     element.parent().addClass(settings.errorClass);
 
-                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (file)');
+                    instance.public_methods.sendEvent(category, action, fieldName + ' (file)');
 
                 } else {
 
                     element.addClass(settings.errorClass);
 
-                    ga && ga('send', 'event', 'form (' + self.formName + ')', 'client validation error', fieldName + ' (other)');
+                    instance.public_methods.sendEvent(category, action, fieldName + ' (other)');
 
                 }
 
@@ -605,6 +612,24 @@
 
                 self.fadeTo(300, 0.2);
                 self.find('input, textarea, select, button').attr('disabled', 'disabled');
+
+            },
+
+            sendEvent: function(category, action, label) {
+
+                if (settings.trackers && settings.trackers !== null) {
+
+                    for (var i = 0; i < settings.trackers.length; i++) {
+
+                        ga(settings.trackers[i] + '.send', 'event', category, action, label, true);
+
+                    }
+
+                } else {
+
+                    ga('send', 'event', category, action, label, true);
+
+                }
 
             }
 
