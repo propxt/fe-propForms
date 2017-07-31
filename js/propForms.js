@@ -621,13 +621,13 @@
 
                     for (var i = 0; i < settings.trackers.length; i++) {
 
-                        ga(settings.trackers[i] + '.send', 'event', category, action, label, true);
+                        ga(settings.trackers[i] + '.send', 'event', category, action, label);
 
                     }
 
                 } else {
 
-                    ga('send', 'event', category, action, label, true);
+                    ga('send', 'event', category, action, label);
 
                 }
 
