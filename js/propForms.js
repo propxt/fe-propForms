@@ -139,7 +139,7 @@
 
                         success: function(data) {
 
-                            var category = 'form (' + self.formName + ')',
+                            var category = 'Form: ' + self.formName,
                                 label = self.formName;
 
                             try {
@@ -299,7 +299,7 @@
                 element.closest(settings.wrapper).addClass(settings.errorClass);
 
                 var fieldName = element.attr('name').replace(/-/g, ' ').toLowerCase(),
-                    category = 'form (' + self.formName + ')',
+                    category = 'Form: ' + self.formName,
                     action = 'client validation error';
 
                 if(type == 'SELECT') {
@@ -621,13 +621,13 @@
 
                     for (var i = 0; i < settings.trackers.length; i++) {
 
-                        ga(settings.trackers[i] + '.send', 'event', category, action, label);
+                        ga(settings.trackers[i] + '.send', 'event', category.toLowerCase(), action.toLowerCase(), label.toLowerCase());
 
                     }
 
                 } else {
 
-                    ga('send', 'event', category, action, label);
+                    ga('send', 'event', category.toLowerCase(), action.toLowerCase(), label.toLowerCase());
 
                 }
 
