@@ -6,7 +6,7 @@
         pluginName = 'Prop Forms';
 
     $.fn.propForm = function(options, param) {
-        
+
         var results = [];
 
         for(var i = 0; i < this.length; i++) {
@@ -36,9 +36,9 @@
                     } else {
 
                         return instance.public_methods[options](param);
-                        
+
                     }
-                        
+
                 } else {
 
                     instance.private_methods.error(options + ' is not a defined method!');
@@ -75,7 +75,7 @@
         var requiredElements = self.find('*[required]');
 
         instance.private_methods = {
-            
+
             error: function(error) {
 
                 if(console) console.warn('['+pluginName+' '+version+'] - ' + error);
@@ -97,7 +97,7 @@
                         self.addClass('error-form');
 
                         return false;
-                        
+
                     } else if(settings.ajax) {
 
                         instance.private_methods.ajax['submit'](e);
@@ -129,10 +129,10 @@
                             } else {
 
                                 var welcomeMessage = self.prev('.welcomeText');
-                                
+
                                 instance.public_methods.disable();
                                 welcomeMessage.text('Working...');
-                                
+
                             }
 
                         },
@@ -147,14 +147,14 @@
                                 var form = $(data).find('#'+self.attr('id')),
                                     successMessage = $(data).find('.successText'),
                                     errorMessage = $(data).find('.errorText'),
-                                    welcomeMessage = self.prev('.welcomeText');                                                                
-                                
+                                    welcomeMessage = self.prev('.welcomeText');
+
                                 if(welcomeMessage.length > 0) welcomeMessage.remove();
 
                                 if(form.hasClass('form-error')) {
 
                                     instance.public_methods.sendEvent(category, 'server validation error', label);
-                                    
+
                                     self.parent().find('.errorText').remove();
 
                                     var required = form.find('.error'),
@@ -178,7 +178,7 @@
                                 } else {
 
                                     instance.public_methods.sendEvent(category, 'successful submission', label);
-                                    
+
                                     if(typeof settings.success == 'function') {
 
                                         settings.success.call(self, {
@@ -195,23 +195,23 @@
 
                                         self.parent().find('.errorText').remove();
                                         successMessage.prependTo(self.parent());
-                                        
+
                                     }
 
                                 }
-                                
+
                                 if(successMessage.length === 0 && errorMessage.length === 0) {
-                                    
+
                                     console.log('Passed with no success message...');
-                                    
+
                                 }
 
-                            } 
+                            }
 
                             catch(e) {
 
                                 instance.public_methods.sendEvent(category, 'fatal error', label);
-                                
+
                                 instance.private_methods.error(e);
 
                             }
@@ -221,7 +221,7 @@
                         error: function(data) {
 
                             console.error(data);
-                            
+
                             instance.public_methods.sendEvent(category, 'ajax request error', label);
 
                         }
@@ -284,7 +284,7 @@
 
                     break;
 
-                    default: 
+                    default:
 
                         return 0;
 
@@ -353,7 +353,7 @@
 
                         break;
 
-                        case 'check' : 
+                        case 'check' :
 
                             var message = 'Please check this field to continue';
 
@@ -365,7 +365,7 @@
 
                         break;
 
-                        default : 
+                        default :
 
                             var message = 'Please enter a valid value';
 
@@ -375,7 +375,7 @@
 
                     var parent = type != 'radio' ? element.closest(settings.wrapper) : element.closest(settings.wrapper).parent(),
                         tooltip = parent.find('.error-tooltip');
-                    
+
                     message = type == 'SELECT' ? 'Please select an option' : message;
 
                     if(tooltip.length <= 0) {
@@ -412,14 +412,14 @@
 
                         element.focus();
 
-                    });             
-                    
+                    });
+
                 }
 
             },
 
             validFields: function(element, type) {
-                
+
                 element.closest(settings.wrapper).removeClass(settings.errorClass);
 
                 if(type == 'SELECT') {
@@ -428,7 +428,7 @@
 
                 } else if(element.hasClass('file')) {
 
-                    element.parent().removeClass(settings.errorClass); 
+                    element.parent().removeClass(settings.errorClass);
 
                 } else if(type == 'checkbox') {
 
@@ -437,7 +437,7 @@
                 } else {
 
                     element.removeClass(settings.errorClass);
-                    
+
                 }
 
                 element.closest(settings.wrapper).find('.error-tooltip').remove();
@@ -460,7 +460,7 @@
 
             },
 
-            findFields: function(fields, search) {  
+            findFields: function(fields, search) {
 
                 var compare = [];
 
@@ -472,7 +472,7 @@
                     if(type == search) {
 
                         compare.push(field.attr('name'));
-                        
+
                     }
 
                 }
@@ -509,16 +509,16 @@
 
                     if(requiredElement.is(':visible') && requiredElement.attr('disabled') != 'disabled' ) {
 
-                        if(requiredElement.val().length <= instance.private_methods.fieldLength(data)) {
+                        if(requiredElement.val().length < instance.private_methods.fieldLength(data)) {
 
                             instance.private_methods.errorFields(requiredElement, type);
 
-                        } else if(data == 'email') {                            
+                        } else if(data == 'email') {
 
                             if(instance.private_methods.validateEmail(requiredElement.val()) == false) {
 
                                 instance.private_methods.errorFields(requiredElement, type, data);
-                                
+
                             } else if(instance.private_methods.findFields(requiredElements, data).length > 1 && settings.compare == true) {
 
                                 instance.private_methods.compareFields(requiredElement, type, instance.private_methods.findFields(requiredElements, data));
@@ -553,23 +553,23 @@
 
                                     } else {
 
-                                        instance.private_methods.validFields(requiredElement, 'checkbox');                              
+                                        instance.private_methods.validFields(requiredElement, 'checkbox');
 
-                                    }                                   
+                                    }
 
                                 break;
 
-                                case 'radio': 
+                                case 'radio':
 
                                     var radioSet = $('*[name="' + requiredElement.attr('name') + '"]');
 
                                     if(!(radioSet.is(':checked'))) {
-                                        
+
                                         instance.private_methods.errorFields(radioSet, 'radio', 'radio');
-                                        
+
                                     } else {
 
-                                        instance.private_methods.validFields(radioSet, 'checkbox'); 
+                                        instance.private_methods.validFields(radioSet, 'checkbox');
 
                                     }
 
@@ -644,7 +644,7 @@
             if(element) {
 
                 core_funcs[element].handler();
-                
+
             } else {
 
                 core_funcs.initialise();
@@ -724,7 +724,7 @@
                         if(selectedOption[i].value != elementValue) {
 
                             continue;
-                            
+
                         } else {
 
                             var optionText = selectedOption[i].textContent || selectedOption[i].innerText;
@@ -740,8 +740,8 @@
                 setLabel: function(element, value) {
 
                     element.parentNode.querySelectorAll('.select')[0].innerHTML = value;
-                    
-                } 
+
+                }
 
             },
 
@@ -791,9 +791,9 @@
 
                         marker.removeClass('active');
 
-                    }  
+                    }
 
-                } 
+                }
 
             },
 
@@ -805,7 +805,7 @@
 
                     for(var i = 0; i < elements.length; i++) {
 
-                        if((elements[i].getAttribute('type') != 'radio') || elements[i].getAttribute('data-no-wrap') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('radio-wrap')) : (new RegExp('(^| )' + 'radio-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;                     
+                        if((elements[i].getAttribute('type') != 'radio') || elements[i].getAttribute('data-no-wrap') || (elements[i].parentNode.classList ? (elements[i].parentNode.classList.contains('radio-wrap')) : (new RegExp('(^| )' + 'radio-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className)))) continue;
 
                         core_funcs['radio'].wrap(elements[i]);
                         core_funcs['radio'].check(elements[i]);
@@ -824,18 +824,18 @@
                 bind: function(element) {
 
                     var elementGroup = document.getElementsByName(element.getAttribute('name'));
-                    
+
                     element.onchange = function() {
 
                         for(var i = 0; i < elementGroup.length; i++) {
-                            
+
                             core_funcs['radio'].check(elementGroup[i]);
 
                         }
 
                     }
 
-                }, 
+                },
 
                 check: function(element) {
 
@@ -849,7 +849,7 @@
 
                         marker.classList ? marker.classList.remove('active') :  marker.className = marker.className.replace(new RegExp('active' + className.split(' ').join('|') + 'active', 'gi'), ' ');
 
-                    }                       
+                    }
 
                 }
 
@@ -907,13 +907,13 @@
                         for(var i = 0; i < element.files.length; i++) {
 
                             var fileLabel = document.createElement('span');
-                            
+
                             fileLabel.innerHTML = element.files[i].name + (i != element.files.length -1 ? ', ' : '');
 
                             label.appendChild(fileLabel);
 
                         }
-                        
+
                     }
 
                 }
@@ -927,34 +927,34 @@
     }
 
     window.slickForms = slickForms;
-    
+
 })();
 
 var logging = function(code, callback, multiple) {
- 
+
     var self = this,
         progress = 0;
- 
+
     self.init = function(e) {
- 
+
         self.check(e.which);
-        
+
     }
- 
+
     self.check = function(key) {
- 
+
         key == code[progress] ? progress++ : progress = 0;
-        if(progress == code.length) self.complete(); 
- 
+        if(progress == code.length) self.complete();
+
     }
- 
+
     self.complete = function() {
- 
+
         if(multiple !== true) window.onkeyup = null;
         if(typeof callback == 'function') callback.call();
- 
+
     }
- 
+
     window.onkeyup = self.init;
- 
+
 };
