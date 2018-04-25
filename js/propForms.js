@@ -509,11 +509,7 @@
 
                     if(requiredElement.is(':visible') && requiredElement.attr('disabled') != 'disabled' ) {
 
-                        if(requiredElement.val().length < instance.private_methods.fieldLength(data)) {
-
-                            instance.private_methods.errorFields(requiredElement, type);
-
-                        } else if(data == 'email') {
+                        if(data == 'email') {
 
                             if(instance.private_methods.validateEmail(requiredElement.val()) == false) {
 
@@ -577,6 +573,8 @@
 
                             }
 
+                        } else if(requiredElement.val().length <= instance.private_methods.fieldLength(data)) {
+                            instance.private_methods.errorFields(requiredElement, type);
                         } else {
 
                             instance.private_methods.validFields(requiredElement, type);
