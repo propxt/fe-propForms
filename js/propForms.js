@@ -673,7 +673,7 @@
 
                     for (var i = 0; i < elements.length; i++) {
 
-                        if(elements[i].getAttribute('ng-model')) {
+                        if(elements[i].getAttribute('ng-model') || !(elements[i].getAttribute('name') && elements[i].getAttribute('id'))) {
 
                             continue;
 
