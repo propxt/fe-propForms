@@ -679,6 +679,8 @@
 
                         }
 
+			if (elements[i].closest("#dmn-partner-widget")) continue;
+
                         if(elements[i].parentNode.classList ? (!elements[i].parentNode.classList.contains('select-wrap')) : (!new RegExp('(^| )' + 'select-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className))) core_funcs['select'].wrap(elements[i]);
 
                         if(elements[i].getAttribute('data-label')) {
