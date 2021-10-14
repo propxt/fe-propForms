@@ -365,6 +365,12 @@
 
                         break;
 
+                        case 'chrismast_dayclose' :
+
+                            var message = 'Apologies. We are closed on 24th and 25th December. Please select another day to visit.';
+
+                        break;
+
                         default :
 
                             var message = 'Please enter a valid value';
@@ -372,6 +378,7 @@
                         break;
 
                     }
+
 
                     var parent = type != 'radio' ? element.closest(settings.wrapper) : element.closest(settings.wrapper).parent(),
                         tooltip = parent.find('.error-tooltip');
@@ -500,7 +507,7 @@
         instance.public_methods = {
 
             validate: function() {
-
+                
                 for(var i = 0; i < requiredElements.length; i++) {
 
                     var type = requiredElements[i].nodeName,
@@ -509,7 +516,11 @@
 
                     if(requiredElement.is(':visible') && requiredElement.attr('disabled') != 'disabled' ) {
 
-                        if(data == 'email') {
+                        if(requiredElement.val().length < instance.private_methods.fieldLength(data)) {
+
+                            instance.private_methods.errorFields(requiredElement, type);
+
+                        } else if(data == 'email') {
 
                             if(instance.private_methods.validateEmail(requiredElement.val()) == false) {
 
@@ -573,8 +584,6 @@
 
                             }
 
-                        } else if(requiredElement.val().length <= instance.private_methods.fieldLength(data)) {
-                            instance.private_methods.errorFields(requiredElement, type);
                         } else {
 
                             instance.private_methods.validFields(requiredElement, type);
@@ -588,6 +597,23 @@
                     }
 
                 }
+
+
+                // Validate reservation-date-day 24, 25 / 12
+                if($('[data-rdateday]').length && $('[data-rdatemonth]').length) {
+                    var rDateDay = $('[data-rdateday]'),
+                        rDateMonth = $('[data-rdatemonth]'),
+                        nRDateDay = Number(rDateDay.val()),
+                        nRDatMonth = Number(rDateMonth.val())
+                        ;
+                       
+                    
+                    if(nRDatMonth === 12 && (nRDateDay === 24 || nRDateDay === 25)) {
+                        instance.private_methods.errorFields($('[data-rdateday]'), 'select', 'chrismast_dayclose');
+                        instance.private_methods.errorFields($('[data-rdatemonth]'), 'select', 'chrismast_dayclose');
+                    }
+                }
+
 
                 return self.find('.'+settings.errorClass).length > 0 ? false : true;
 
@@ -673,13 +699,11 @@
 
                     for (var i = 0; i < elements.length; i++) {
 
-                        if(elements[i].getAttribute('ng-model') || !(elements[i].getAttribute('name') && elements[i].getAttribute('id'))) {
+                        if(elements[i].getAttribute('ng-model')) {
 
                             continue;
 
                         }
-
-			if (elements[i].closest("#dmn-partner-widget")) continue;
 
                         if(elements[i].parentNode.classList ? (!elements[i].parentNode.classList.contains('select-wrap')) : (!new RegExp('(^| )' + 'select-wrap' + '( |$)', 'gi').test(elements[i].parentNode.className))) core_funcs['select'].wrap(elements[i]);
 
